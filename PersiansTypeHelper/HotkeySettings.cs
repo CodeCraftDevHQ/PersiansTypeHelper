@@ -10,6 +10,9 @@ namespace PersianTypeHelper
         public uint Modifiers { get; set; } = NativeMethods.MOD_CONTROL | NativeMethods.MOD_SHIFT;
         public uint Key { get; set; } = (uint)Keys.P;
         public int MaxChars { get; set; } = 200;
+
+        
+        public int ThemeMode { get; set; } = 0;
     }
 
     public static class SettingsManager
@@ -50,7 +53,7 @@ namespace PersianTypeHelper
             }
             catch
             {
-               
+                
             }
         }
     }

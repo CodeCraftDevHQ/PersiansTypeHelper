@@ -16,6 +16,9 @@ namespace PersianTypeHelper
             SelectedModifiers = currentModifiers;
             SelectedKey = currentKey;
 
+            var settings = SettingsManager.Load();
+            var palette = Theme.Resolve((ThemeMode)settings.ThemeMode);
+
             this.Text = "تغییر کلید میانبر";
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.StartPosition = FormStartPosition.CenterScreen;
@@ -25,6 +28,7 @@ namespace PersianTypeHelper
             this.Width = 380;
             this.Height = 170;
             this.KeyPreview = true;
+            this.BackColor = palette.Background;
 
             var lblInfo = new Label
             {
@@ -33,7 +37,8 @@ namespace PersianTypeHelper
                 Height = 40,
                 TextAlign = ContentAlignment.MiddleCenter,
                 RightToLeft = RightToLeft.Yes,
-                Font = new Font("Tahoma", 9)
+                Font = new Font("Tahoma", 9),
+                ForeColor = palette.TextSecondary
             };
 
             lblCurrent = new Label
@@ -42,15 +47,21 @@ namespace PersianTypeHelper
                 Dock = DockStyle.Top,
                 Height = 50,
                 Font = new Font("Tahoma", 14, FontStyle.Bold),
-                TextAlign = ContentAlignment.MiddleCenter
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = palette.TextPrimary
             };
 
             var btnCancel = new Button
             {
                 Text = "انصراف",
                 Dock = DockStyle.Bottom,
-                DialogResult = DialogResult.Cancel
+                DialogResult = DialogResult.Cancel,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = palette.Surface,
+                ForeColor = palette.TextPrimary,
+                Height = 34
             };
+            btnCancel.FlatAppearance.BorderColor = palette.Border;
 
             this.Controls.Add(lblCurrent);
             this.Controls.Add(lblInfo);
@@ -65,7 +76,7 @@ namespace PersianTypeHelper
             e.Handled = true;
             e.SuppressKeyPress = true;
 
-           
+          
             if (e.KeyCode == Keys.ControlKey || e.KeyCode == Keys.ShiftKey || e.KeyCode == Keys.Menu)
                 return;
 
