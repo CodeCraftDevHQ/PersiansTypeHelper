@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
 
 namespace PersianTypeHelper
@@ -10,6 +9,7 @@ namespace PersianTypeHelper
         public Keys SelectedKey { get; private set; }
 
         private readonly Label lblCurrent;
+        private readonly int appLanguage;
 
         public HotkeyCaptureForm(uint currentModifiers, Keys currentKey)
         {
@@ -18,8 +18,9 @@ namespace PersianTypeHelper
 
             var settings = SettingsManager.Load();
             var palette = Theme.Resolve((ThemeMode)settings.ThemeMode);
+            appLanguage = settings.AppLanguage;
 
-            this.Text = "تغییر کلید میانبر";
+            this.Text = Loc.S(appLanguage, "تغییر کلید میانبر", "Change Hotkey");
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.MaximizeBox = false;
@@ -32,18 +33,20 @@ namespace PersianTypeHelper
 
             var lblInfo = new Label
             {
-                Text = "کلید ترکیبی جدید رو فشار بده (مثلاً Ctrl+Shift+P)",
+                Text = Loc.S(appLanguage,
+                    "کلید ترکیبی جدید رو فشار بده (مثلاً Ctrl+Shift+P)",
+                    "Press the new key combination (e.g. Ctrl+Shift+P)"),
                 Dock = DockStyle.Top,
                 Height = 40,
                 TextAlign = ContentAlignment.MiddleCenter,
-                RightToLeft = RightToLeft.Yes,
+                RightToLeft = appLanguage == 1 ? RightToLeft.No : RightToLeft.Yes,
                 Font = new Font("Tahoma", 9),
                 ForeColor = palette.TextSecondary
             };
 
             lblCurrent = new Label
             {
-                Text = FormatHotkey(currentModifiers, currentKey),
+                Text = HotkeyFormatter.Format(currentModifiers, currentKey),
                 Dock = DockStyle.Top,
                 Height = 50,
                 Font = new Font("Tahoma", 14, FontStyle.Bold),
@@ -53,7 +56,7 @@ namespace PersianTypeHelper
 
             var btnCancel = new Button
             {
-                Text = "انصراف",
+                Text = Loc.S(appLanguage, "انصراف", "Cancel"),
                 Dock = DockStyle.Bottom,
                 DialogResult = DialogResult.Cancel,
                 FlatStyle = FlatStyle.Flat,
@@ -76,7 +79,7 @@ namespace PersianTypeHelper
             e.Handled = true;
             e.SuppressKeyPress = true;
 
-          
+            // نادیده گرفتن فشار تنهای کلیدهای Modifier
             if (e.KeyCode == Keys.ControlKey || e.KeyCode == Keys.ShiftKey || e.KeyCode == Keys.Menu)
                 return;
 
@@ -94,26 +97,16 @@ namespace PersianTypeHelper
 
             if (modifiers == 0)
             {
-                lblCurrent.Text = "باید حداقل یک Ctrl/Shift/Alt باشه";
+                lblCurrent.Text = Loc.S(appLanguage, "باید حداقل یک Ctrl/Shift/Alt باشه", "Must include at least one Ctrl/Shift/Alt");
                 return;
             }
 
             SelectedModifiers = modifiers;
             SelectedKey = e.KeyCode;
-            lblCurrent.Text = FormatHotkey(modifiers, e.KeyCode);
+            lblCurrent.Text = HotkeyFormatter.Format(modifiers, e.KeyCode);
 
             this.DialogResult = DialogResult.OK;
             this.Close();
-        }
-
-        private static string FormatHotkey(uint modifiers, Keys key)
-        {
-            var parts = new List<string>();
-            if ((modifiers & NativeMethods.MOD_CONTROL) != 0) parts.Add("Ctrl");
-            if ((modifiers & NativeMethods.MOD_SHIFT) != 0) parts.Add("Shift");
-            if ((modifiers & NativeMethods.MOD_ALT) != 0) parts.Add("Alt");
-            parts.Add(key.ToString());
-            return string.Join(" + ", parts);
         }
     }
 }

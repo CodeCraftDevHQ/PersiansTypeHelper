@@ -11,8 +11,17 @@ namespace PersianTypeHelper
         public uint Key { get; set; } = (uint)Keys.P;
         public int MaxChars { get; set; } = 200;
 
-        
+      
         public int ThemeMode { get; set; } = 0;
+
+       
+        public int DigitMode { get; set; } = 1;
+
+        
+        public bool KeepHarakat { get; set; } = true;
+
+        
+        public int AppLanguage { get; set; } = 0;
     }
 
     public static class SettingsManager
@@ -37,7 +46,7 @@ namespace PersianTypeHelper
             }
             catch
             {
-                
+               
             }
 
             return new HotkeySettings();

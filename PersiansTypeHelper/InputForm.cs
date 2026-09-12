@@ -38,7 +38,7 @@ namespace PersianTypeHelper
             StartPosition = FormStartPosition.CenterScreen;
             TopMost = true;
             ShowInTaskbar = false;
-            Text = "تایپ فارسی";
+            Text = Loc.S(settings.AppLanguage, "تایپ فارسی", "Persian Typing");
             Width = 560;
             Height = 148;
             AutoScaleMode = AutoScaleMode.Font;
@@ -59,12 +59,12 @@ namespace PersianTypeHelper
 
             lblTitle = new Label
             {
-                Text = "تایپ فارسی",
+                Text = Text,
                 Font = new Font("Tahoma", 9.5f),
                 Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleRight,
-                Padding = new Padding(0, 0, 10, 0),
-                RightToLeft = RightToLeft.Yes
+                TextAlign = settings.AppLanguage == 1 ? ContentAlignment.MiddleLeft : ContentAlignment.MiddleRight,
+                Padding = settings.AppLanguage == 1 ? new Padding(10, 0, 0, 0) : new Padding(0, 0, 10, 0),
+                RightToLeft = settings.AppLanguage == 1 ? RightToLeft.No : RightToLeft.Yes
             };
             lblTitle.MouseDown += TitleBar_MouseDown;
             lblTitle.MouseMove += TitleBar_MouseMove;
@@ -92,7 +92,7 @@ namespace PersianTypeHelper
             themeIcon.MouseLeave += (s, e) => { themeIcon.BackColor = palette.Surface; themeIcon.Invalidate(); };
             themeIcon.Click += ThemeIcon_Click;
 
-            
+         
             titleBar.Controls.Add(lblTitle);
             titleBar.Controls.Add(themeIcon);
             titleBar.Controls.Add(pinIcon);
@@ -145,7 +145,7 @@ namespace PersianTypeHelper
             var center = new PointF(rect.Width / 2f, rect.Height / 2f);
             using var brush = new SolidBrush(palette.TextPrimary);
 
-
+          
             if (isDarkMode)
             {
                 float r = 4.2f;
@@ -196,11 +196,11 @@ namespace PersianTypeHelper
             };
             optionsRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100)); 
             optionsRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));     
-            optionsRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));    
+            optionsRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));     
 
             lblMax = new Label
             {
-                Text = "حداکثر کاراکتر:",
+                Text = Loc.S(settings.AppLanguage, "حداکثر کاراکتر:", "Max characters:"),
                 AutoSize = true,
                 Anchor = AnchorStyles.Right,
                 Margin = new Padding(6, 8, 4, 0)
@@ -233,14 +233,16 @@ namespace PersianTypeHelper
             };
             txtInput.KeyDown += TxtInput_KeyDown;
 
+          
             contentPanel.Controls.Add(txtInput);
             contentPanel.Controls.Add(optionsRow);
 
-            
+           
             Controls.Add(contentPanel);
             Controls.Add(titleBar);
         }
 
+   
         private void ApplyTheme()
         {
             BackColor = palette.Border;
@@ -295,7 +297,10 @@ namespace PersianTypeHelper
             if (string.IsNullOrEmpty(raw))
                 return;
 
-            string reshaped = PersianReshaper.ProcessText(raw, e_numbers: true, f_numbers: true, e_harakat: true);
+           
+            bool useArabicDigits = settings.DigitMode == 2;
+            bool usePersianDigits = settings.DigitMode == 1;
+            string reshaped = PersianReshaper.ProcessText(raw, e_numbers: useArabicDigits, f_numbers: usePersianDigits, e_harakat: settings.KeepHarakat);
 
             Clipboard.SetText(reshaped);
 
@@ -309,7 +314,7 @@ namespace PersianTypeHelper
 
             if (isPinned)
             {
-              
+               
                 txtInput.Clear();
                 Show();
                 Activate();
