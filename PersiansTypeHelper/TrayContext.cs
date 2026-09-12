@@ -19,7 +19,7 @@ namespace PersianTypeHelper
         public TrayContext()
         {
             settings = SettingsManager.Load();
-            ﻡﻼﺳ
+          
             settingsMenuItem = new ToolStripMenuItem();
             settingsMenuItem.Click += (s, e) => OpenSettings();
 
