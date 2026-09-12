@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic.Logging;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -22,6 +21,7 @@ namespace PersianTypeHelper
         private NumericUpDown numMaxChars;
 
         private Label lblDigitsTitle;
+        private FlowLayoutPanel digitsGroup;
         private RadioButton radDigitsEnglish;
         private RadioButton radDigitsPersian;
         private RadioButton radDigitsArabic;
@@ -29,14 +29,17 @@ namespace PersianTypeHelper
         private CheckBox chkKeepHarakat;
 
         private Label lblThemeTitle;
+        private FlowLayoutPanel themeGroup;
         private RadioButton radThemeAuto;
         private RadioButton radThemeLight;
         private RadioButton radThemeDark;
 
         private Label lblLanguageTitle;
+        private FlowLayoutPanel languageGroup;
         private RadioButton radLangFa;
         private RadioButton radLangEn;
 
+        private Panel closeRow;
         private Button btnClose;
 
         public SettingsForm(Action onChangeHotkeyRequested)
@@ -60,6 +63,25 @@ namespace PersianTypeHelper
         }
 
         private string T(string fa, string en) => Loc.S(settings.AppLanguage, fa, en);
+
+
+        private static FlowLayoutPanel CreateRadioGroup(params RadioButton[] radios)
+        {
+            var panel = new FlowLayoutPanel
+            {
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false,
+                Margin = new Padding(0, 0, 0, 18)
+            };
+            foreach (var r in radios)
+            {
+                r.Margin = new Padding(0, 2, 0, 2);
+                panel.Controls.Add(r);
+            }
+            return panel;
+        }
 
         private void BuildUi()
         {
@@ -106,11 +128,11 @@ namespace PersianTypeHelper
                 SettingsManager.Save(settings);
             };
 
-            // --- شیوه‌ی نمایش اعداد ---
+            // --- شیوه‌ی نمایش اعداد (یک گروه مستقل) ---
             lblDigitsTitle = new Label { AutoSize = true, Font = new Font("Tahoma", 9.5f, FontStyle.Bold), Margin = new Padding(0, 0, 0, 6) };
-            radDigitsEnglish = new RadioButton { AutoSize = true, Margin = new Padding(0, 2, 0, 2) };
-            radDigitsPersian = new RadioButton { AutoSize = true, Margin = new Padding(0, 2, 0, 2) };
-            radDigitsArabic = new RadioButton { AutoSize = true, Margin = new Padding(0, 2, 0, 18) };
+            radDigitsEnglish = new RadioButton { AutoSize = true };
+            radDigitsPersian = new RadioButton { AutoSize = true };
+            radDigitsArabic = new RadioButton { AutoSize = true };
             switch (settings.DigitMode)
             {
                 case 2: radDigitsArabic.Checked = true; break;
@@ -120,6 +142,7 @@ namespace PersianTypeHelper
             radDigitsEnglish.CheckedChanged += (s, e) => { if (radDigitsEnglish.Checked) SaveDigitMode(0); };
             radDigitsPersian.CheckedChanged += (s, e) => { if (radDigitsPersian.Checked) SaveDigitMode(1); };
             radDigitsArabic.CheckedChanged += (s, e) => { if (radDigitsArabic.Checked) SaveDigitMode(2); };
+            digitsGroup = CreateRadioGroup(radDigitsEnglish, radDigitsPersian, radDigitsArabic);
 
             // --- اعراب ---
             chkKeepHarakat = new CheckBox { AutoSize = true, Checked = settings.KeepHarakat, Margin = new Padding(0, 0, 0, 18) };
@@ -129,11 +152,11 @@ namespace PersianTypeHelper
                 SettingsManager.Save(settings);
             };
 
-            // --- ظاهر (تم) ---
+            // --- ظاهر (تم) — یک گروه مستقل ---
             lblThemeTitle = new Label { AutoSize = true, Font = new Font("Tahoma", 9.5f, FontStyle.Bold), Margin = new Padding(0, 0, 0, 6) };
-            radThemeAuto = new RadioButton { AutoSize = true, Margin = new Padding(0, 2, 0, 2) };
-            radThemeLight = new RadioButton { AutoSize = true, Margin = new Padding(0, 2, 0, 2) };
-            radThemeDark = new RadioButton { AutoSize = true, Margin = new Padding(0, 2, 0, 18) };
+            radThemeAuto = new RadioButton { AutoSize = true };
+            radThemeLight = new RadioButton { AutoSize = true };
+            radThemeDark = new RadioButton { AutoSize = true };
             switch (settings.ThemeMode)
             {
                 case 1: radThemeLight.Checked = true; break;
@@ -143,40 +166,38 @@ namespace PersianTypeHelper
             radThemeAuto.CheckedChanged += (s, e) => { if (radThemeAuto.Checked) SaveTheme(0); };
             radThemeLight.CheckedChanged += (s, e) => { if (radThemeLight.Checked) SaveTheme(1); };
             radThemeDark.CheckedChanged += (s, e) => { if (radThemeDark.Checked) SaveTheme(2); };
+            themeGroup = CreateRadioGroup(radThemeAuto, radThemeLight, radThemeDark);
 
-            // --- زبان برنامه ---
+            // --- زبان برنامه — یک گروه مستقل ---
             lblLanguageTitle = new Label { AutoSize = true, Font = new Font("Tahoma", 9.5f, FontStyle.Bold), Margin = new Padding(0, 0, 0, 6) };
-            radLangFa = new RadioButton { AutoSize = true, Text = "فارسی", Margin = new Padding(0, 2, 0, 2) };
-            radLangEn = new RadioButton { AutoSize = true, Text = "English", Margin = new Padding(0, 2, 0, 4) };
+            radLangFa = new RadioButton { AutoSize = true, Text = "فارسی" };
+            radLangEn = new RadioButton { AutoSize = true, Text = "English" };
             radLangFa.Checked = settings.AppLanguage == 0;
             radLangEn.Checked = settings.AppLanguage == 1;
             radLangFa.CheckedChanged += (s, e) => { if (radLangFa.Checked) SaveLanguage(0); };
             radLangEn.CheckedChanged += (s, e) => { if (radLangEn.Checked) SaveLanguage(1); };
+            languageGroup = CreateRadioGroup(radLangFa, radLangEn);
 
             root.Controls.Add(lblHotkeyTitle);
             root.Controls.Add(hotkeyRow);
             root.Controls.Add(lblMaxCharsTitle);
             root.Controls.Add(numMaxChars);
             root.Controls.Add(lblDigitsTitle);
-            root.Controls.Add(radDigitsEnglish);
-            root.Controls.Add(radDigitsPersian);
-            root.Controls.Add(radDigitsArabic);
+            root.Controls.Add(digitsGroup);
             root.Controls.Add(chkKeepHarakat);
             root.Controls.Add(lblThemeTitle);
-            root.Controls.Add(radThemeAuto);
-            root.Controls.Add(radThemeLight);
-            root.Controls.Add(radThemeDark);
+            root.Controls.Add(themeGroup);
             root.Controls.Add(lblLanguageTitle);
-            root.Controls.Add(radLangFa);
-            root.Controls.Add(radLangEn);
+            root.Controls.Add(languageGroup);
 
             scrollHost.Controls.Add(root);
 
-            var closeRow = new Panel { Dock = DockStyle.Bottom, Height = 50, Padding = new Padding(18, 8, 18, 8) };
+            closeRow = new Panel { Dock = DockStyle.Bottom, Height = 50, Padding = new Padding(18, 8, 18, 8) };
             btnClose = new Button { Dock = DockStyle.Right, Width = 100, FlatStyle = FlatStyle.Flat };
             btnClose.Click += (s, e) => Close();
             closeRow.Controls.Add(btnClose);
 
+       
             Controls.Add(scrollHost);
             Controls.Add(closeRow);
         }
@@ -204,10 +225,10 @@ namespace PersianTypeHelper
 
         private void BtnChangeHotkey_Click(object? sender, EventArgs e)
         {
-         
+     
             onChangeHotkeyRequested?.Invoke();
 
-     
+       
             settings = SettingsManager.Load();
             UpdateHotkeyLabel();
         }
@@ -222,6 +243,7 @@ namespace PersianTypeHelper
             BackColor = palette.Background;
             scrollHost.BackColor = palette.Background;
             root.BackColor = palette.Background;
+            closeRow.BackColor = palette.Background;
 
             foreach (Control c in AllControls(root))
             {
@@ -253,10 +275,6 @@ namespace PersianTypeHelper
             btnClose.BackColor = palette.Surface;
             btnClose.ForeColor = palette.TextPrimary;
             btnClose.FlatAppearance.BorderColor = palette.Border;
-
-            foreach (Control c in Controls)
-                if (c is Panel p && p.Dock == DockStyle.Bottom)
-                    p.BackColor = palette.Background;
         }
 
         private static System.Collections.Generic.IEnumerable<Control> AllControls(Control parent)
@@ -271,6 +289,11 @@ namespace PersianTypeHelper
 
         private void ApplyLanguage()
         {
+    
+            bool isEnglish = settings.AppLanguage == 1;
+            RightToLeft = isEnglish ? RightToLeft.No : RightToLeft.Yes;
+            RightToLeftLayout = !isEnglish;
+
             Text = T("تنظیمات", "Settings");
 
             lblHotkeyTitle.Text = T("کلید میانبر:", "Hotkey:");
