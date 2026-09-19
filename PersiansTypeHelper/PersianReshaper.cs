@@ -28,7 +28,7 @@ namespace PersianTypeHelper
         private static readonly string arnumbs = "٠١٢٣٤٥٦٧٨٩";
         private static readonly string fanumbs = "۰۱۲۳۴۵۶۷۸۹";
         private static readonly string ennumbs = "0123456789";
-        private static readonly int laIndex = 168; 
+        private static readonly int laIndex = 168;
 
         private static readonly HashSet<char> notEng = new HashSet<char>();
 
@@ -63,18 +63,18 @@ namespace PersianTypeHelper
             {
                 char current = chars[g];
 
-                
+               
                 if (current == '\r')
                     continue;
 
-                
+               
                 if (current == '\n')
                 {
                     pieces.Add("\n");
                     continue;
                 }
 
-                
+               
                 int b = 1, a = 1;
                 while (g - b >= 0 && harakat.Contains(chars[g - b])) b++;
                 while (g + a < len && harakat.Contains(chars[g + a])) a++;
@@ -83,7 +83,7 @@ namespace PersianTypeHelper
                 int pos = 0;
                 if (g == 0)
                 {
-                    
+                   
                     if (g + a < len && rightChars.Contains(chars[g + a]))
                         pos = 1;
                     else
@@ -91,7 +91,7 @@ namespace PersianTypeHelper
                 }
                 else if (g == len - 1)
                 {
-                    
+                   
                     if (g - b >= 0 && leftChars.Contains(chars[g - b]))
                         pos = 3;
                     else
@@ -112,7 +112,7 @@ namespace PersianTypeHelper
                     }
                 }
 
-            
+               
                 if (current == 'ء')
                 {
                     pieces.Add("ﺀ");
@@ -125,14 +125,14 @@ namespace PersianTypeHelper
                 }
                 else if (arabic.Contains(current))
                 {
-                    
+                   
                     if (current == 'ل' && g + 1 < len)
                     {
                         char nextChar = chars[g + 1];
                         int arPos = arabic.IndexOf(nextChar);
                         if (arPos >= 0 && arPos < 4) 
                         {
-                            
+                           
                             int ligIndex = (arPos * 4) + pos + laIndex;
                             if (ligIndex < unicode.Length)
                             {
@@ -176,7 +176,7 @@ namespace PersianTypeHelper
                     while (h < len && !IsSpecialChar(chars[h]))
                     {
                         char c = chars[h];
-                        
+                       
                         if (ennumbs.Contains(c))
                         {
                             int idx = ennumbs.IndexOf(c);
@@ -208,7 +208,7 @@ namespace PersianTypeHelper
                     }
 
                     pieces.Add(run);
-                    g = h - 1; 
+                    g = h - 1;
                 }
             }
 
@@ -227,8 +227,7 @@ namespace PersianTypeHelper
 
         private static bool IsSpecialChar(char c)
         {
-            return notEng.Contains(c) || unicode.Contains(c) || brackets.Contains(c);
+            return notEng.Contains(c) || unicode.Contains(c) || brackets.Contains(c) || arabic.Contains(c) || harakat.Contains(c) || c == 'ء';
         }
     }
 }
-
